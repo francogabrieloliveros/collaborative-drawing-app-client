@@ -5,7 +5,7 @@ import eraserIcon from "../assets/eraser-icon.svg";
 import deleteIcon from "../assets/delete-icon.svg";
 import drawerIcon from "../assets/drawer-icon.svg";
 
-export default function LeftNav({ socket }) {
+export default function LeftNav({ socket, sliderRef, colorRef, setIsPen }) {
   const [shownav, setShownav] = useState(true);
 
   return (
@@ -18,17 +18,20 @@ export default function LeftNav({ socket }) {
         <input
           type="color"
           tabIndex={-1}
+          ref={colorRef}
           className="transition-all hover:scale-110 active:scale-90"
         />
         <img
           className="aspect-square w-full cursor-pointer transition-all select-none hover:scale-110 active:scale-90"
           src={pencilIcon}
           alt="pencil-icon"
+          onClick={() => setIsPen(true)}
         />
         <img
           className="aspect-square w-full cursor-pointer transition-all select-none hover:scale-110 active:scale-90"
           src={eraserIcon}
           alt="eraser-icon"
+          onClick={() => setIsPen(false)}
         />
         <input
           className="vertical-slider"
@@ -37,6 +40,7 @@ export default function LeftNav({ socket }) {
           min={1}
           max={300}
           defaultValue={10}
+          ref={sliderRef}
           step={1}
         />
         <img

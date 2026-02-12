@@ -8,19 +8,22 @@ export default function Canvas(props) {
   const ctxRef = useRef(null);
   const rectRef = useRef(null);
   const isDrawingRef = useRef(false);
+  const sliderRef = useRef(null);
+  const colorRef = useRef(null);
   const lastXRef = useRef(0);
   const lastYRef = useRef(0);
+  const isPen = useRef(true);
   const socket = io(import.meta.env.VITE_BACKEND_API_URL);
   useEffect(() => {
     socket.on("load_canvas", (data) => {
-      data.forEach(({ lastX, lastY, x, y }) => {
-        draw(ctxRef.current, lastX, lastY, x, y);
+      data.forEach(({ lastX, lastY, x, y, lineWidth, color }) => {
+        draw(ctxRef.current, lastX, lastY, x, y, lineWidth, color);
       });
     });
 
     socket.on("received_draw", (data) => {
-      const { lastX, lastY, x, y } = data;
-      draw(ctxRef.current, lastX, lastY, x, y);
+      const { lastX, lastY, x, y, lineWidth, color } = data;
+      draw(ctxRef.current, lastX, lastY, x, y, lineWidth, color);
     });
 
     socket.on("clear", (data) => {
@@ -57,9 +60,16 @@ export default function Canvas(props) {
     return { x, y };
   };
 
+  const setIsPen = (bool) => (isPen.current = bool);
+
   return (
     <div className="relative left-1/2 mx-auto mt-10 inline-block translate-x-[-50%]">
-      <LeftNav socket={socket} />
+      <LeftNav
+        socket={socket}
+        sliderRef={sliderRef}
+        colorRef={colorRef}
+        setIsPen={setIsPen}
+      />
       <canvas
         ref={canvasRef}
         className="w-[90dvw] max-w-[856px] rounded-[clamp(0px,3vw,4em)] border-3 bg-white"
@@ -76,14 +86,26 @@ export default function Canvas(props) {
           if (!isDrawingRef.current) return;
 
           const { x, y } = getCoordinates(e);
+          const lineWidth = sliderRef.current.value;
+          const color = isPen.current ? colorRef.current.value : "#ffffff";
 
-          draw(ctxRef.current, lastXRef.current, lastYRef.current, x, y);
+          draw(
+            ctxRef.current,
+            lastXRef.current,
+            lastYRef.current,
+            x,
+            y,
+            lineWidth,
+            color,
+          );
 
           socket.emit("draw", {
             lastX: lastXRef.current,
             lastY: lastYRef.current,
             x,
             y,
+            lineWidth,
+            color,
           });
 
           lastXRef.current = x;
