@@ -1,19 +1,22 @@
 import { useState } from "react";
-
+import { useCanvas } from "../hooks/useCanvas";
+import NavButton from "./left-nav/NavButton";
 import pencilIcon from "../assets/pencil-icon.svg";
 import eraserIcon from "../assets/eraser-icon.svg";
 import deleteIcon from "../assets/delete-icon.svg";
 import drawerIcon from "../assets/drawer-icon.svg";
 
-export default function LeftNav({ socket, sliderRef, colorRef, setIsPen }) {
+export default function LeftNav() {
+  const { socket, sliderRef, colorRef, setIsPen } = useCanvas();
   const [shownav, setShownav] = useState(true);
+  const navWidth = "clamp(60px,10%,10%)";
 
   return (
-    <div
-      className={`absolute top-1/2 ${shownav ? "left-2" : "left-[calc(clamp(60px,10%,10%)*-0.8)]"} flex h-[80%] w-[clamp(60px,10%,10%)] translate-y-[-50%] min-[1043px]:left-[-90px]`}
+    <aside
+      className={`absolute top-1/2 ${shownav ? "left-2" : `left-[calc(${navWidth}*-0.8)]`} flex h-[80%] w-[${navWidth}] translate-y-[-50%] min-[1043px]:left-[-90px]`}
     >
       <div
-        className={`flex w-[90%] flex-col items-center justify-between rounded-[3em] border-3 bg-white px-[10%] py-[20%] transition-all ${shownav ? undefined : "max-[1043px]:translate-x-[-100%]"}`}
+        className={`flex w-[90%] flex-col items-center justify-between rounded-[3em] border-3 px-[10%] py-[20%] transition-all ${shownav ? undefined : "max-[1043px]:-translate-x-[120%]"} bg-white`}
       >
         <input
           type="color"
@@ -21,16 +24,14 @@ export default function LeftNav({ socket, sliderRef, colorRef, setIsPen }) {
           ref={colorRef}
           className="transition-all hover:scale-110 active:scale-90"
         />
-        <img
-          className="aspect-square w-full cursor-pointer transition-all select-none hover:scale-110 active:scale-90"
+        <NavButton
           src={pencilIcon}
-          alt="pencil-icon"
+          alt={"pencil-button"}
           onClick={() => setIsPen(true)}
         />
-        <img
-          className="aspect-square w-full cursor-pointer transition-all select-none hover:scale-110 active:scale-90"
+        <NavButton
           src={eraserIcon}
-          alt="eraser-icon"
+          alt={"eraser-button"}
           onClick={() => setIsPen(false)}
         />
         <input
@@ -43,13 +44,10 @@ export default function LeftNav({ socket, sliderRef, colorRef, setIsPen }) {
           ref={sliderRef}
           step={1}
         />
-        <img
-          className="aspect-square w-full cursor-pointer transition-all select-none hover:scale-110 active:scale-90"
+        <NavButton
           src={deleteIcon}
-          alt="delete-icon"
-          onClick={() => {
-            socket.emit("clear", {});
-          }}
+          alt={"delete-button"}
+          onClick={() => socket.emit("clear", {})}
         />
       </div>
       <img
@@ -60,6 +58,6 @@ export default function LeftNav({ socket, sliderRef, colorRef, setIsPen }) {
         alt="drawer-icon"
         onClick={() => setShownav((prev) => !prev)}
       />
-    </div>
+    </aside>
   );
 }

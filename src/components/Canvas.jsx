@@ -1,119 +1,68 @@
 import { useRef, useEffect } from "react";
-import { io } from "socket.io-client";
-import draw from "../utils/draw";
-import LeftNav from "../components/LeftNav.jsx";
+import { useCanvas } from "../hooks/useCanvas.js";
+import {
+  initCanvas,
+  setDrawing,
+  handleMove,
+  handleDown,
+  loadCanvas,
+  receiveDraw,
+  clearCanvas,
+} from "../utils/index.js";
 
-export default function Canvas(props) {
+export default function Canvas() {
+  const { socket, sliderRef, colorRef, isPen } = useCanvas();
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
-  const rectRef = useRef(null);
   const isDrawingRef = useRef(false);
-  const sliderRef = useRef(null);
-  const colorRef = useRef(null);
   const lastXRef = useRef(0);
   const lastYRef = useRef(0);
-  const isPen = useRef(true);
-  const socket = io(import.meta.env.VITE_BACKEND_API_URL);
+
+  // Initialize canvas
   useEffect(() => {
-    socket.on("load_canvas", (data) => {
-      data.forEach(({ lastX, lastY, x, y, lineWidth, color }) => {
-        draw(ctxRef.current, lastX, lastY, x, y, lineWidth, color);
-      });
-    });
-
-    socket.on("received_draw", (data) => {
-      const { lastX, lastY, x, y, lineWidth, color } = data;
-      draw(ctxRef.current, lastX, lastY, x, y, lineWidth, color);
-    });
-
-    socket.on("clear", (data) => {
-      ctxRef.current.clearRect(
-        0,
-        0,
-        canvasRef.current.width,
-        canvasRef.current.height,
-      );
-    });
-  }, [socket]);
-
-  useEffect(() => {
-    const ctx = canvasRef.current.getContext("2d");
-
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-    ctx.lineWidth = 10;
-
-    ctxRef.current = ctx;
+    ctxRef.current = initCanvas(canvasRef.current);
   }, []);
 
-  const getCoordinates = (e) => {
-    rectRef.current = canvasRef.current.getBoundingClientRect();
+  // Handle received socket events
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = ctxRef.current;
 
-    const { clientX, clientY } = e.nativeEvent;
+    socket.on("load_canvas", (data) => loadCanvas(data, ctx));
+    socket.on("received_draw", (data) => receiveDraw(data, ctx));
+    socket.on("clear", () => clearCanvas(ctx, canvas));
+  }, [socket]);
 
-    const scaleX = canvasRef.current.width / rectRef.current.width;
-    const scaleY = canvasRef.current.height / rectRef.current.height;
-
-    const x = (clientX - rectRef.current.left) * scaleX;
-    const y = (clientY - rectRef.current.top) * scaleY;
-
-    return { x, y };
-  };
-
-  const setIsPen = (bool) => (isPen.current = bool);
+  const drawStart = (e) =>
+    handleDown(e, isDrawingRef, canvasRef.current, lastXRef, lastYRef);
+  const drawMove = (e) =>
+    handleMove(
+      e,
+      socket,
+      isDrawingRef.current,
+      canvasRef.current,
+      sliderRef.current,
+      colorRef.current,
+      isPen.current,
+      ctxRef.current,
+      lastXRef,
+      lastYRef,
+    );
+  const drawEnd = setDrawing(isDrawingRef, false);
 
   return (
-    <div className="relative left-1/2 mx-auto mt-10 inline-block translate-x-[-50%]">
-      <LeftNav
-        socket={socket}
-        sliderRef={sliderRef}
-        colorRef={colorRef}
-        setIsPen={setIsPen}
-      />
-      <canvas
-        ref={canvasRef}
-        className="w-[90dvw] max-w-[856px] rounded-[clamp(0px,3vw,4em)] border-3 bg-white"
-        {...props}
-        onMouseDown={(e) => {
-          const { clientX, clientY } = e.nativeEvent;
-          isDrawingRef.current = true;
-
-          const { x, y } = getCoordinates(e);
-          lastXRef.current = x;
-          lastYRef.current = y;
-        }}
-        onMouseMove={(e) => {
-          if (!isDrawingRef.current) return;
-
-          const { x, y } = getCoordinates(e);
-          const lineWidth = sliderRef.current.value;
-          const color = isPen.current ? colorRef.current.value : "#ffffff";
-
-          draw(
-            ctxRef.current,
-            lastXRef.current,
-            lastYRef.current,
-            x,
-            y,
-            lineWidth,
-            color,
-          );
-
-          socket.emit("draw", {
-            lastX: lastXRef.current,
-            lastY: lastYRef.current,
-            x,
-            y,
-            lineWidth,
-            color,
-          });
-
-          lastXRef.current = x;
-          lastYRef.current = y;
-        }}
-        onMouseUp={() => (isDrawingRef.current = false)}
-        onMouseOut={() => (isDrawingRef.current = false)}
-      />
-    </div>
+    <canvas
+      width={850}
+      height={850}
+      ref={canvasRef}
+      className="h-[90dvw] max-h-[856px] w-[90dvw] max-w-[856px] rounded-[clamp(0px,3vw,4em)] border-3 bg-white"
+      onTouchStart={drawStart}
+      onMouseDown={drawStart}
+      onTouchMove={drawMove}
+      onMouseMove={drawMove}
+      onTouchEnd={drawEnd}
+      onMouseUp={drawEnd}
+      onMouseOut={drawEnd}
+    />
   );
 }
