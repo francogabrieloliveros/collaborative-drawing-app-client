@@ -12,10 +12,10 @@ export default function LeftNav() {
 
   return (
     <aside
-      className={`absolute top-1/2 ${shownav ? "left-2" : `left-[calc(clamp(60px,10%,10%)*-0.8)]`} flex h-[80%] w-[clamp(60px,10%,10%)] translate-y-[-50%] min-[1043px]:left-[-90px]`}
+      className={`absolute top-1/2 ${shownav ? "left-2" : `left-[calc(clamp(60px,10%,10%)*-0.6)]`} flex h-[80%] w-[clamp(60px,10%,10%)] translate-y-[-50%] min-[1043px]:left-[-90px]`}
     >
       <div
-        className={`flex w-[90%] flex-col items-center justify-between rounded-[3em] border-3 px-[10%] py-[20%] transition-all ${shownav ? undefined : "max-[1043px]:-translate-x-[120%]"} bg-white`}
+        className={`flex w-[70%] flex-col items-center justify-between rounded-[3em] border-3 px-[10%] py-[20%] transition-all ${shownav ? undefined : "max-[1043px]:-translate-x-[170%]"} bg-white`}
       >
         <input
           type="color"

@@ -27,8 +27,8 @@ input[type="color"] {
   -moz-appearance: none;
   appearance: none;
   flex-shrink: 0;
-  width: clamp(30px, 6dvw, 54px);
-  height: clamp(30px, 6dvw, 54px);
+  width: clamp(30px, 6dvw, 30px);
+  height: clamp(30px, 6dvw, 30px);
   aspect-ratio: 1/1;
   background-color: transparent;
   border: none;
