@@ -11,7 +11,7 @@ export default function CanvasPage() {
   const colorRef = useRef(null);
 
   return (
-    <main className="relative left-1/2 mx-auto mt-10 inline-block translate-x-[-50%]">
+    <main className="relative top-[50dvh] left-1/2 inline-block -translate-x-1/2 -translate-y-1/2">
       <CanvasContext value={{ socket, sliderRef, colorRef, isPen, setIsPen }}>
         <LeftNav />
         <Canvas />

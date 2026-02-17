@@ -9,11 +9,10 @@ import drawerIcon from "../assets/drawer-icon.svg";
 export default function LeftNav() {
   const { socket, sliderRef, colorRef, setIsPen } = useCanvas();
   const [shownav, setShownav] = useState(true);
-  const navWidth = "clamp(60px,10%,10%)";
 
   return (
     <aside
-      className={`absolute top-1/2 ${shownav ? "left-2" : `left-[calc(${navWidth}*-0.8)]`} flex h-[80%] w-[${navWidth}] translate-y-[-50%] min-[1043px]:left-[-90px]`}
+      className={`absolute top-1/2 ${shownav ? "left-2" : `left-[calc(clamp(60px,10%,10%)*-0.8)]`} flex h-[80%] w-[clamp(60px,10%,10%)] translate-y-[-50%] min-[1043px]:left-[-90px]`}
     >
       <div
         className={`flex w-[90%] flex-col items-center justify-between rounded-[3em] border-3 px-[10%] py-[20%] transition-all ${shownav ? undefined : "max-[1043px]:-translate-x-[120%]"} bg-white`}
