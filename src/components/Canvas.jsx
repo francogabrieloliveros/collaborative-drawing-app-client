@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { useCanvas } from "../hooks/useCanvas.js";
+import { TailSpin } from "react-loader-spinner";
 import {
   initCanvas,
   setDrawing,
@@ -57,9 +58,19 @@ export default function Canvas() {
   return (
     <>
       {!connected ? (
-        <div className="fixed top-1/2 left-1/2 -translate-1/2 rounded-sm bg-gray-900 px-1 text-sm text-gray-400 select-none">
-          Server not connected
-        </div>
+        <>
+          <div></div>
+          <div className="fixed top-1/2 left-1/2 flex -translate-1/2 flex-col items-center rounded-sm px-1 py-3 text-sm text-black select-none">
+            <TailSpin
+              height="30"
+              width="30"
+              color="black"
+              ariaLabel="tail-spin-loading"
+              visible={true}
+            />
+            Server not connected
+          </div>
+        </>
       ) : undefined}
       <canvas
         width={850}
